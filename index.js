@@ -47,7 +47,7 @@ function generateUniqueCode(url) {
 let comURL;
 app.get("/",(req,res) => {
     comURL = req.protocol + '://' + req.get('host') + req.originalUrl;
-    res.render("index",{message : "🔗"});
+    res.render("index",{message :"http://shortenurl-zmns.onrender.com/2RpTmLn",icon:"content_copy"});
 })
 
 app.post("/",async (req,res) => {
@@ -59,7 +59,7 @@ app.post("/",async (req,res) => {
     })
     HashMap.create(data);
     var fullUrl =  comURL + short;
-    res.render("index",{message : fullUrl});
+    res.render("index",{message : fullUrl,icon: 'content_copy'});
 })
 
 app.get("/:uqcode", async (req,res) => {

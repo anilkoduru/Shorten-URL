@@ -40,7 +40,6 @@ function generateUniqueCode(url) {
   while (code.length < 7) {
     code = '0' + code;
   }
-  code = code.substring(0,7);
   return code;
 }
 
@@ -52,14 +51,40 @@ app.get("/",(req,res) => {
 
 app.post("/",async (req,res) => {
     const url = req.body.longURL;
-    const short = await generateUniqueCode(url);
-    const data = new HashMap({
-        longURL : url,
-        shortURL : short
-    })
-    HashMap.create(data);
-    var fullUrl =  comURL + short;
-    res.render("index",{message : fullUrl,icon: 'content_copy'});
+    if(url.length == 0){
+        res.render("index",{message :"",icon:""});
+    }
+    let code = await generateUniqueCode(url);
+    let short = code.substring(0,7);
+    HashMap.findOne({shortURL:short}).then((data) =>{
+        if(data){
+            if(data.longURL === url){
+                var fullUrl =  comURL + short;
+                res.render("index",{message : fullUrl,icon: 'content_copy'});
+            }
+            else{
+                let k =  Math.floor(Math.random()*code.length) - 8;
+                short = code.substring(k,7);
+                const data = new HashMap({
+                    longURL : url,
+                    shortURL : short
+                })
+                HashMap.create(data);
+                var fullUrl =  comURL + short;
+                res.render("index",{message : fullUrl,icon: 'content_copy'});
+            }
+        }else{
+            const data = new HashMap({
+                longURL : url,
+                shortURL : short
+            })
+            HashMap.create(data);
+            var fullUrl =  comURL + short;
+            res.render("index",{message : fullUrl,icon: 'content_copy'});
+        }
+    }).catch((err)=> {
+        return res.status(500).send("Sorry, There is a server issue");
+    });
 })
 
 app.get("/:uqcode", async (req,res) => {
